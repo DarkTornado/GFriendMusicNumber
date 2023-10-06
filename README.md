@@ -1,2 +1,1 @@
-# GFriendMusicNumber
-여자친구 노래방 번호
+# 여자친구 노래 노래방 번호
