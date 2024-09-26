@@ -1,4 +1,5 @@
-<html>
+<!DOCTYPE html>
+<html lang="ko">
 <header>
     <meta charset='utf-8'>
     <meta name='viewport' content='user-scalable=no width=device-width' />
@@ -153,8 +154,7 @@ function searchMusic(data) {
     var input = document.getElementById('input').value.toLowerCase();
     data = data.replace(/null/g, '(미수록)');
     data = data.split('\n');
-    var src = '',
-        count = 0;
+    var src = '', count = 0;
 
     for (var n = 0; n < data.length; n++) {
         if (!data[n].toLowerCase().includes(input)) continue;
@@ -183,6 +183,10 @@ function searchMusic(data) {
         alert('검색 결과가 ' + count + '개 있습니다.');
         document.getElementById('result').innerHTML = src;
     }
+}
+
+function hideTitle() {
+    document.getElementsByClassName('header')[0].style.display = 'none';
 }
     </script>
 </body>
