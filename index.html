@@ -2,21 +2,21 @@
 <header>
     <meta charset='utf-8'>
     <meta name='viewport' content='user-scalable=no width=device-width' />
-    <title>여자친구 노래 노래방 번호</title>
+    <title>여자친구 노래방 번호 검색기</title>
 </header>
 <style>
     body {
         margin: 0px;
         color: black;
-        font-size: 18px;
+        font-size: 16px;
         font-family: NanumGothic;
     }
 
     div.header {
         padding: 14px;
         color: white;
-        background: linear-gradient(to right, #00ABC0, #5F4B8B);
-        font-size: 22px;
+        background: linear-gradient(to right, #5F4B8B, #00ABC0);
+        font-size: 20px;
         box-shadow: 1px 2px 4px 1px rgba(0, 0, 0, 0.3);
     }
 
@@ -28,12 +28,13 @@
 
     div.footer {
         margin: 0px;
-    }    
-    
+    }
+
     .textview {
         display: block;
         margin: 4px;
     }
+
     .edittext {
         display: block;
         width: 98%;
@@ -44,6 +45,14 @@
         border-bottom: 1.5px solid #000000;
         margin: 4px auto;
     }
+    ::placeholder {
+        color: #757575;
+        opacity: 1; /* Firefox */
+    }
+    ::-ms-input-placeholder { /* Edge */
+        color: #757575;
+    }
+
     .button {
         display: block;
         background: #EEEEEE;
@@ -52,22 +61,37 @@
         width: 98%;
         height: 43px;
         outline: none;
-        margin: 16px auto;
+        margin: 16px auto 2px;
     }
-    
-    table {
+
+    div.table_outer {
+        padding: 8px;
+    }
+
+    table#result {
         width: 100%;
-        border: 1px solid #000000;
+        border: 0px;
         border-collapse: collapse;
-        margin: 0px;
+        margin-top: 8px;
+        margin-bottom: 16px;
     }
 
     td {
-        width: 25%;
-        border: 1px solid #000000;
+        font-size: 16px;
+        border-top: 1px solid #000000;
+        border-bottom: 1px solid #000000;
         text-align: center;
         padding: 8px;
         vertical-align: middle;
+    }
+
+    td.title {
+        font-size: 18px;
+        background-color: #F0EEE9;
+    }
+
+    td.number {
+        border-left: 1px solid #000000;
     }
 
     hr {
@@ -76,31 +100,90 @@
 
     p.copyright {
         text-align: center;
-        font-size: 14px;
+        font-size: 12px;
     }
-
 </style>
 
 <body>
-    <link href="https://hangeul.pstatic.net/hangeul_static/css/nanum-gothic.css" rel="stylesheet">
+    <link href='https://hangeul.pstatic.net/hangeul_static/css/nanum-gothic.css' rel='stylesheet'>
     <div class=header>
-        여자친구 노래방 수록곡 검색기
+        여자친구 노래방 번호 검색기
     </div>
     <div class=body>
         <div>
             <span class=textview>검색어 : </span>
-            <input id="input" class=edittext placeholder="검색어를 입력하세요..." />
-            <input class=button type=button value='검색' onclick='search();'/>
-        <div>
-        <table class=result>
-        
-        </table>
+            <input id='input' class=edittext placeholder='검색어 입력... (생략시 전체곡 조회)' />
+            <input class=button type=button value='검색' onclick='search();' />
+        </div>
+        <div class=table_outer>
+            <table id='result'></table>
+        </div>
         <hr>
     </div>
     <div class=footer>
-        <p class=copyright>© 2023 Dark Tornado, All rights reserved.</p>
+        <p class=copyright>© 2023-2024 Dark Tornado, All rights reserved.</p>
     </div>
     <script>
+/*
+깃허브에서는 백-엔드를 못써서 전부 클라이언트에서 처리
+*/
+
+var data = null;
+
+function search() {
+    if (data != null) {
+        searchMusic(data);
+    } else {
+        var req = new XMLHttpRequest();
+        req.open('GET', './MusicList.csv', false);
+        req.onreadystatechange = () => {
+            if (req.readyState === 4) {
+                if (req.status === 200 || req.status == 0) {
+                    var allText = req.responseText;
+                    data = allText;
+                    searchMusic(allText);
+                }
+            }
+        }
+        req.send(null);
+    }
+}
+
+function searchMusic(data) {
+    var input = document.getElementById('input').value.toLowerCase();
+    data = data.replace(/null/g, '(미수록)');
+    data = data.split('\n');
+    var src = '',
+        count = 0;
+
+    for (var n = 0; n < data.length; n++) {
+        if (!data[n].toLowerCase().includes(input)) continue;
+        var datum = data[n].split('::');
+        src += '<tr>';
+        src += '<td colspan=2 class=title><b>' + datum[0] + '</b></td>';
+        src += '</tr>';
+        src += '<tr>';
+        src += '<td width=30%>태진(TJ)</td><td class=number>' + datum[1] + '</td>';
+        src += '</tr>';
+        src += '<tr>';
+        src += '<td>금영</td><td class=number>' + datum[2] + '</td>';
+        src += '</tr>';
+        src += '<tr>';
+        src += '<td rowspan=2>JOYSOUND</td><td class=number>한국어: ' + datum[3] + '</td>';
+        src += '</tr>';
+        src += '<tr>';
+        src += '<td class=number>일본어: ' + datum[4] + '</td>';
+        src += '</tr>';
+        count++;
+    }
+
+    if (count == 0) {
+        alert('검색 결과가 없습니다.');
+    } else {
+        alert('검색 결과가 ' + count + '개 있습니다.');
+        document.getElementById('result').innerHTML = src;
+    }
+}
     </script>
 </body>
 
